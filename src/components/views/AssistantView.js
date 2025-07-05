@@ -6,6 +6,9 @@ export class AssistantView extends LitElement {
             height: 100%;
             display: flex;
             flex-direction: column;
+            background-color: var(--main-content-background);
+            border-radius: var(--content-border-radius);
+            overflow: hidden;
         }
 
         * {
@@ -13,65 +16,105 @@ export class AssistantView extends LitElement {
             cursor: default;
         }
 
-        .response-container {
-            height: calc(100% - 60px);
-            overflow-y: auto;
-            border-radius: 10px;
-            font-size: var(--response-font-size, 18px);
-            line-height: 1.6;
-            background: var(--main-content-background);
-            padding: 16px;
-            scroll-behavior: smooth;
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 10px;
         }
 
-        /* Markdown styling */
-        .response-container h1,
-        .response-container h2,
-        .response-container h3,
-        .response-container h4,
-        .response-container h5,
-        .response-container h6 {
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            position: relative;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            font-size: var(--response-font-size, 16px);
+            line-height: 1.5;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--user-message-background);
+            color: var(--user-message-color);
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: var(--ai-message-background);
+            color: var(--ai-message-color);
+            border-bottom-left-radius: 5px;
+        }
+
+        .ai-label {
+            font-size: 0.7em;
+            color: var(--ai-label-color);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .markdown-content {
+            /* Markdown styling */
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3,
+        .markdown-content h4,
+        .markdown-content h5,
+        .markdown-content h6 {
             margin: 1.2em 0 0.6em 0;
             color: var(--text-color);
             font-weight: 600;
         }
 
-        .response-container h1 {
+        .markdown-content h1 {
             font-size: 1.8em;
         }
-        .response-container h2 {
+        .markdown-content h2 {
             font-size: 1.5em;
         }
-        .response-container h3 {
+        .markdown-content h3 {
             font-size: 1.3em;
         }
-        .response-container h4 {
+        .markdown-content h4 {
             font-size: 1.1em;
         }
-        .response-container h5 {
+        .markdown-content h5 {
             font-size: 1em;
         }
-        .response-container h6 {
+        .markdown-content h6 {
             font-size: 0.9em;
         }
 
-        .response-container p {
+        .markdown-content p {
             margin: 0.8em 0;
             color: var(--text-color);
         }
 
-        .response-container ul,
-        .response-container ol {
+        .markdown-content ul,
+        .markdown-content ol {
             margin: 0.8em 0;
             padding-left: 2em;
             color: var(--text-color);
         }
 
-        .response-container li {
+        .markdown-content li {
             margin: 0.4em 0;
         }
 
-        .response-container blockquote {
+        .markdown-content blockquote {
             margin: 1em 0;
             padding: 0.5em 1em;
             border-left: 4px solid var(--focus-border-color);
@@ -79,7 +122,7 @@ export class AssistantView extends LitElement {
             font-style: italic;
         }
 
-        .response-container code {
+        .markdown-content code {
             background: rgba(255, 255, 255, 0.1);
             padding: 0.2em 0.4em;
             border-radius: 3px;
@@ -87,7 +130,7 @@ export class AssistantView extends LitElement {
             font-size: 0.85em;
         }
 
-        .response-container pre {
+        .markdown-content pre {
             background: var(--input-background);
             border: 1px solid var(--button-border);
             border-radius: 6px;
@@ -96,82 +139,83 @@ export class AssistantView extends LitElement {
             margin: 1em 0;
         }
 
-        .response-container pre code {
+        .markdown-content pre code {
             background: none;
             padding: 0;
             border-radius: 0;
         }
 
-        .response-container a {
+        .markdown-content a {
             color: var(--link-color);
             text-decoration: none;
         }
 
-        .response-container a:hover {
+        .markdown-content a:hover {
             text-decoration: underline;
         }
 
-        .response-container strong,
-        .response-container b {
+        .markdown-content strong,
+        .markdown-content b {
             font-weight: 600;
             color: var(--text-color);
         }
 
-        .response-container em,
-        .response-container i {
+        .markdown-content em,
+        .markdown-content i {
             font-style: italic;
         }
 
-        .response-container hr {
+        .markdown-content hr {
             border: none;
             border-top: 1px solid var(--border-color);
             margin: 2em 0;
         }
 
-        .response-container table {
+        .markdown-content table {
             border-collapse: collapse;
             width: 100%;
             margin: 1em 0;
         }
 
-        .response-container th,
-        .response-container td {
+        .markdown-content th,
+        .markdown-content td {
             border: 1px solid var(--border-color);
             padding: 0.5em;
             text-align: left;
         }
 
-        .response-container th {
+        .markdown-content th {
             background: var(--input-background);
             font-weight: 600;
         }
 
-        .response-container::-webkit-scrollbar {
+        .messages-container::-webkit-scrollbar {
             width: 8px;
         }
 
-        .response-container::-webkit-scrollbar-track {
+        .messages-container::-webkit-scrollbar-track {
             background: var(--scrollbar-track);
             border-radius: 4px;
         }
 
-        .response-container::-webkit-scrollbar-thumb {
+        .messages-container::-webkit-scrollbar-thumb {
             background: var(--scrollbar-thumb);
             border-radius: 4px;
         }
 
-        .response-container::-webkit-scrollbar-thumb:hover {
+        .messages-container::-webkit-scrollbar-thumb:hover {
             background: var(--scrollbar-thumb-hover);
         }
 
-        .text-input-container {
+        .input-area {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
-            align-items: center;
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--main-content-background);
         }
 
-        .text-input-container input {
+        .input-area input {
             flex: 1;
             background: var(--input-background);
             color: var(--text-color);
@@ -181,94 +225,85 @@ export class AssistantView extends LitElement {
             font-size: 14px;
         }
 
-        .text-input-container input:focus {
+        .input-area input:focus {
             outline: none;
             border-color: var(--focus-border-color);
             box-shadow: 0 0 0 3px var(--focus-box-shadow);
             background: var(--input-focus-background);
         }
 
-        .text-input-container input::placeholder {
+        .input-area input::placeholder {
             color: var(--placeholder-color);
         }
 
-        .text-input-container button {
-            background: transparent;
-            color: var(--start-button-background);
-            border: none;
-            padding: 0;
-            border-radius: 100px;
-        }
-
-        .text-input-container button:hover {
-            background: var(--text-input-button-hover);
-        }
-
-        .nav-button {
-            background: transparent;
+        .send-button,
+        .new-chat-button {
+            background: var(--start-button-background);
             color: white;
             border: none;
-            padding: 4px;
-            border-radius: 50%;
-            font-size: 12px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
             display: flex;
             align-items: center;
-            width: 36px;
-            height: 36px;
             justify-content: center;
+            gap: 5px;
         }
 
-        .nav-button:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .send-button:hover,
+        .new-chat-button:hover {
+            background: var(--start-button-hover-background);
         }
 
-        .nav-button:disabled {
-            opacity: 0.3;
+        .copy-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
         }
 
-        .nav-button svg {
-            stroke: white !important;
-        }
-
-        .response-counter {
-            font-size: 12px;
-            color: var(--description-color);
-            white-space: nowrap;
-            min-width: 60px;
-            text-align: center;
+        .copy-button:hover {
+            opacity: 1;
         }
     `;
 
     static properties = {
-        responses: { type: Array },
+        messages: { type: Array },
         currentResponseIndex: { type: Number },
         selectedProfile: { type: String },
         onSendText: { type: Function },
+        onNewChat: { type: Function },
     };
 
     constructor() {
         super();
-        this.responses = [];
+        this.messages = [];
         this.currentResponseIndex = -1;
         this.selectedProfile = 'interview';
         this.onSendText = () => {};
+        this.onNewChat = () => {};
     }
 
-    getProfileNames() {
-        return {
-            interview: 'Job Interview',
-            sales: 'Sales Call',
-            meeting: 'Business Meeting',
-            presentation: 'Presentation',
-            negotiation: 'Negotiation',
-        };
+    async copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            console.log('Text copied to clipboard');
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+        }
     }
 
-    getCurrentResponse() {
-        const profileNames = this.getProfileNames();
-        return this.responses.length > 0 && this.currentResponseIndex >= 0
-            ? this.responses[this.currentResponseIndex]
-            : `Hey, Im listening to your ${profileNames[this.selectedProfile] || 'session'}?`;
+    handleNewChat() {
+        this.messages = [];
+        this.currentResponseIndex = -1;
+        this.dispatchEvent(new CustomEvent('new-chat'));
+        this.requestUpdate();
     }
 
     renderMarkdown(content) {
@@ -293,49 +328,9 @@ export class AssistantView extends LitElement {
         return content; // Fallback if marked is not available
     }
 
-    getResponseCounter() {
-        return this.responses.length > 0 ? `${this.currentResponseIndex + 1}/${this.responses.length}` : '';
-    }
+    
 
-    navigateToPreviousResponse() {
-        if (this.currentResponseIndex > 0) {
-            this.currentResponseIndex--;
-            this.dispatchEvent(
-                new CustomEvent('response-index-changed', {
-                    detail: { index: this.currentResponseIndex },
-                })
-            );
-            this.requestUpdate();
-        }
-    }
-
-    navigateToNextResponse() {
-        if (this.currentResponseIndex < this.responses.length - 1) {
-            this.currentResponseIndex++;
-            this.dispatchEvent(
-                new CustomEvent('response-index-changed', {
-                    detail: { index: this.currentResponseIndex },
-                })
-            );
-            this.requestUpdate();
-        }
-    }
-
-    scrollResponseUp() {
-        const container = this.shadowRoot.querySelector('.response-container');
-        if (container) {
-            const scrollAmount = container.clientHeight * 0.3; // Scroll 30% of container height
-            container.scrollTop = Math.max(0, container.scrollTop - scrollAmount);
-        }
-    }
-
-    scrollResponseDown() {
-        const container = this.shadowRoot.querySelector('.response-container');
-        if (container) {
-            const scrollAmount = container.clientHeight * 0.3; // Scroll 30% of container height
-            container.scrollTop = Math.min(container.scrollHeight - container.clientHeight, container.scrollTop + scrollAmount);
-        }
-    }
+    
 
     loadFontSize() {
         const fontSize = localStorage.getItem('fontSize');
@@ -351,57 +346,10 @@ export class AssistantView extends LitElement {
 
         // Load and apply font size
         this.loadFontSize();
-
-        // Set up IPC listeners for keyboard shortcuts
-        if (window.require) {
-            const { ipcRenderer } = window.require('electron');
-
-            this.handlePreviousResponse = () => {
-                console.log('Received navigate-previous-response message');
-                this.navigateToPreviousResponse();
-            };
-
-            this.handleNextResponse = () => {
-                console.log('Received navigate-next-response message');
-                this.navigateToNextResponse();
-            };
-
-            this.handleScrollUp = () => {
-                console.log('Received scroll-response-up message');
-                this.scrollResponseUp();
-            };
-
-            this.handleScrollDown = () => {
-                console.log('Received scroll-response-down message');
-                this.scrollResponseDown();
-            };
-
-            ipcRenderer.on('navigate-previous-response', this.handlePreviousResponse);
-            ipcRenderer.on('navigate-next-response', this.handleNextResponse);
-            ipcRenderer.on('scroll-response-up', this.handleScrollUp);
-            ipcRenderer.on('scroll-response-down', this.handleScrollDown);
-        }
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
-
-        // Clean up IPC listeners
-        if (window.require) {
-            const { ipcRenderer } = window.require('electron');
-            if (this.handlePreviousResponse) {
-                ipcRenderer.removeListener('navigate-previous-response', this.handlePreviousResponse);
-            }
-            if (this.handleNextResponse) {
-                ipcRenderer.removeListener('navigate-next-response', this.handleNextResponse);
-            }
-            if (this.handleScrollUp) {
-                ipcRenderer.removeListener('scroll-response-up', this.handleScrollUp);
-            }
-            if (this.handleScrollDown) {
-                ipcRenderer.removeListener('scroll-response-down', this.handleScrollDown);
-            }
-        }
     }
 
     async handleSendText() {
@@ -422,7 +370,7 @@ export class AssistantView extends LitElement {
 
     scrollToBottom() {
         setTimeout(() => {
-            const container = this.shadowRoot.querySelector('.response-container');
+            const container = this.shadowRoot.querySelector('.messages-container');
             if (container) {
                 container.scrollTop = container.scrollHeight;
             }
@@ -442,58 +390,90 @@ export class AssistantView extends LitElement {
     }
 
     updateResponseContent() {
-        console.log('updateResponseContent called');
-        const container = this.shadowRoot.querySelector('#responseContainer');
-        if (container) {
-            const currentResponse = this.getCurrentResponse();
-            console.log('Current response:', currentResponse);
-            const renderedResponse = this.renderMarkdown(currentResponse);
-            console.log('Rendered response:', renderedResponse);
-            container.innerHTML = renderedResponse;
-        } else {
-            console.log('Response container not found');
-        }
+        // This method is no longer needed as rendering is handled directly in the render() method
+        // by iterating over the messages array.
     }
 
     render() {
-        const currentResponse = this.getCurrentResponse();
-        const responseCounter = this.getResponseCounter();
-
         return html`
-            <div class="response-container" id="responseContainer"></div>
+            <div class="chat-container">
+                <div class="messages-container">
+                    ${this.messages.map(
+                        message => html`
+                            <div class="message-bubble ${message.type === 'user' ? 'user-message' : 'ai-message'}">
+                                <div class="message-content">
+                                    ${message.type === 'ai' ? html`<div class="ai-label">AI</div>` : ''}
+                                    <div class="markdown-content">${this.renderMarkdown(message.text)}</div>
+                                    ${message.type === 'ai'
+                                        ? html`
+                                              <button
+                                                  class="copy-button"
+                                                  @click=${() => this.copyToClipboard(message.text)}
+                                                  title="Copy to clipboard"
+                                              >
+                                                  <svg
+                                                      width="16px"
+                                                      height="16px"
+                                                      stroke-width="1.7"
+                                                      viewBox="0 0 24 24"
+                                                      fill="none"
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                      color="currentColor"
+                                                  >
+                                                      <path
+                                                          d="M19.4 20H9.6C9.26863 20 9 19.7314 9 19.4V9.6C9 9.26863 9.26863 9 9.6 9H19.4C19.7314 9 20 9.26863 20 9.6V19.4C20 19.7314 19.7314 20 19.4 20Z"
+                                                          stroke="currentColor"
+                                                          stroke-width="1.7"
+                                                          stroke-linecap="round"
+                                                          stroke-linejoin="round"
+                                                      ></path>
+                                                      <path
+                                                          d="M15 9V4.6C15 4.26863 14.7314 4 14.4 4H4.6C4.26863 4 4 4.26863 4 4.6V14.4C4 14.7314 4.26863 15 4.6 15H9"
+                                                          stroke="currentColor"
+                                                          stroke-width="1.7"
+                                                          stroke-linecap="round"
+                                                          stroke-linejoin="round"
+                                                      ></path>
+                                                  </svg>
+                                              </button>
+                                          `
+                                        : ''}
+                                </div>
+                            </div>
+                        `
+                    )}
+                </div>
 
-            <div class="text-input-container">
-                <button class="nav-button" @click=${this.navigateToPreviousResponse} ?disabled=${this.currentResponseIndex <= 0}>
-                    <?xml version="1.0" encoding="UTF-8"?><svg
-                        width="24px"
-                        height="24px"
-                        stroke-width="1.7"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        color="#ffffff"
-                    >
-                        <path d="M15 6L9 12L15 18" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </svg>
-                </button>
-
-                ${this.responses.length > 0 ? html` <span class="response-counter">${responseCounter}</span> ` : ''}
-
-                <input type="text" id="textInput" placeholder="Type a message to the AI..." @keydown=${this.handleTextKeydown} />
-
-                <button class="nav-button" @click=${this.navigateToNextResponse} ?disabled=${this.currentResponseIndex >= this.responses.length - 1}>
-                    <?xml version="1.0" encoding="UTF-8"?><svg
-                        width="24px"
-                        height="24px"
-                        stroke-width="1.7"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        color="#ffffff"
-                    >
-                        <path d="M9 6L15 12L9 18" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </svg>
-                </button>
+                <div class="input-area">
+                    <button class="new-chat-button" @click=${this.onNewChat}>New Chat</button>
+                    <input type="text" id="textInput" placeholder="Type a message..." @keydown=${this.handleTextKeydown} />
+                    <button class="send-button" @click=${this.handleSendText}>
+                        <svg
+                            width="24px"
+                            height="24px"
+                            stroke-width="1.7"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            color="currentColor"
+                        >
+                            <path
+                                d="M10 14L21 3"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            ></path>
+                            <path
+                                d="M21 3L14.5 21L10.5 14.5L3 10.5L21 3Z"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         `;
     }

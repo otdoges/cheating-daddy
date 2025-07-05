@@ -1,12 +1,10 @@
 import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
 import { AppHeader } from './AppHeader.js';
+import { InactiveView } from '../views/InactiveView.js';
+import { AnotherView } from '../views/AnotherView.js';
 import { MainView } from '../views/MainView.js';
-import { CustomizeView } from '../views/CustomizeView.js';
-import { HelpView } from '../views/HelpView.js';
-import { HistoryView } from '../views/HistoryView.js';
 import { AssistantView } from '../views/AssistantView.js';
 import { OnboardingView } from '../views/OnboardingView.js';
-import { AdvancedView } from '../views/AdvancedView.js';
 
 export class CheatingDaddyApp extends LitElement {
     static styles = css`
@@ -111,11 +109,10 @@ export class CheatingDaddyApp extends LitElement {
         selectedProfile: { type: String },
         selectedLanguage: { type: String },
         responses: { type: Array },
-        currentResponseIndex: { type: Number },
+        
         selectedScreenshotInterval: { type: String },
         selectedImageQuality: { type: String },
         layoutMode: { type: String },
-        advancedMode: { type: Boolean },
         _viewInstances: { type: Object, state: true },
         _isClickThrough: { state: true },
     };
@@ -134,9 +131,8 @@ export class CheatingDaddyApp extends LitElement {
         this.selectedScreenshotInterval = localStorage.getItem('selectedScreenshotInterval') || '5';
         this.selectedImageQuality = localStorage.getItem('selectedImageQuality') || 'medium';
         this.layoutMode = localStorage.getItem('layoutMode') || 'normal';
-        this.advancedMode = localStorage.getItem('advancedMode') === 'true';
+        
         this.responses = [];
-        this.currentResponseIndex = -1;
         this._viewInstances = new Map();
         this._isClickThrough = false;
 
@@ -196,7 +192,8 @@ export class CheatingDaddyApp extends LitElement {
     }
 
     setResponse(response) {
-        this.responses.push(response);
+        // Add AI response
+        this.responses.push({ type: 'ai', text: response });
 
         // If user is viewing the latest response (or no responses yet), auto-navigate to new response
         if (this.currentResponseIndex === this.responses.length - 2 || this.currentResponseIndex === -1) {
@@ -206,30 +203,20 @@ export class CheatingDaddyApp extends LitElement {
         this.requestUpdate();
     }
 
-    // Header event handlers
-    handleCustomizeClick() {
-        this.currentView = 'customize';
-        this.requestUpdate();
-    }
+    
 
-    handleHelpClick() {
-        this.currentView = 'help';
-        this.requestUpdate();
-    }
-
-    handleHistoryClick() {
-        this.currentView = 'history';
-        this.requestUpdate();
-    }
-
-    handleAdvancedClick() {
-        this.currentView = 'advanced';
+    handleViewChange(view) {
+        this.currentView = view;
         this.requestUpdate();
     }
 
     async handleClose() {
-        if (this.currentView === 'customize' || this.currentView === 'help' || this.currentView === 'history') {
-            this.currentView = 'main';
+        if (this.currentView === 'main' || this.currentView === 'inactive' || this.currentView === 'another') {
+            // Quit the entire application
+            if (window.require) {
+                const { ipcRenderer } = window.require('electron');
+                await ipcRenderer.invoke('quit-application');
+            }
         } else if (this.currentView === 'assistant') {
             if (window.cheddar) {
                 window.cheddar.stopCapture();
@@ -244,11 +231,7 @@ export class CheatingDaddyApp extends LitElement {
             this.currentView = 'main';
             console.log('Session closed');
         } else {
-            // Quit the entire application
-            if (window.require) {
-                const { ipcRenderer } = window.require('electron');
-                await ipcRenderer.invoke('quit-application');
-            }
+            this.currentView = 'main';
         }
     }
 
@@ -328,6 +311,10 @@ export class CheatingDaddyApp extends LitElement {
 
     // Assistant view event handlers
     async handleSendText(message) {
+        // Add user message to the responses array
+        this.responses.push({ type: 'user', text: message });
+        this.requestUpdate();
+
         if (window.cheddar) {
             const result = await window.cheddar.sendTextMessage(message);
 
@@ -340,8 +327,12 @@ export class CheatingDaddyApp extends LitElement {
         }
     }
 
-    handleResponseIndexChanged(e) {
-        this.currentResponseIndex = e.detail.index;
+    handleNewChat() {
+        this.responses = [];
+        this.currentResponseIndex = -1;
+        this.startTime = null;
+        this.statusText = '';
+        this.requestUpdate();
     }
 
     // Onboarding event handlers
@@ -383,9 +374,7 @@ export class CheatingDaddyApp extends LitElement {
         if (changedProperties.has('layoutMode')) {
             this.updateLayoutMode();
         }
-        if (changedProperties.has('advancedMode')) {
-            localStorage.setItem('advancedMode', this.advancedMode.toString());
-        }
+        
     }
 
     renderCurrentView() {
@@ -407,41 +396,18 @@ export class CheatingDaddyApp extends LitElement {
                     ></main-view>
                 `;
 
-            case 'customize':
-                return html`
-                    <customize-view
-                        .selectedProfile=${this.selectedProfile}
-                        .selectedLanguage=${this.selectedLanguage}
-                        .selectedScreenshotInterval=${this.selectedScreenshotInterval}
-                        .selectedImageQuality=${this.selectedImageQuality}
-                        .layoutMode=${this.layoutMode}
-                        .advancedMode=${this.advancedMode}
-                        .onProfileChange=${profile => this.handleProfileChange(profile)}
-                        .onLanguageChange=${language => this.handleLanguageChange(language)}
-                        .onScreenshotIntervalChange=${interval => this.handleScreenshotIntervalChange(interval)}
-                        .onImageQualityChange=${quality => this.handleImageQualityChange(quality)}
-                        .onLayoutModeChange=${layoutMode => this.handleLayoutModeChange(layoutMode)}
-                        .onAdvancedModeChange=${advancedMode => this.handleAdvancedModeChange(advancedMode)}
-                    ></customize-view>
-                `;
+            case 'inactive':
+                return html` <inactive-view></inactive-view> `;
 
-            case 'help':
-                return html` <help-view .onExternalLinkClick=${url => this.handleExternalLinkClick(url)}></help-view> `;
-
-            case 'history':
-                return html` <history-view></history-view> `;
-
-            case 'advanced':
-                return html` <advanced-view></advanced-view> `;
+            case 'another':
+                return html` <another-view></another-view> `;
 
             case 'assistant':
                 return html`
                     <assistant-view
-                        .responses=${this.responses}
-                        .currentResponseIndex=${this.currentResponseIndex}
-                        .selectedProfile=${this.selectedProfile}
+                        .messages=${this.responses}
                         .onSendText=${message => this.handleSendText(message)}
-                        @response-index-changed=${this.handleResponseIndexChanged}
+                        .onNewChat=${() => this.handleNewChat()}
                     ></assistant-view>
                 `;
 
@@ -462,13 +428,9 @@ export class CheatingDaddyApp extends LitElement {
                         .currentView=${this.currentView}
                         .statusText=${this.statusText}
                         .startTime=${this.startTime}
-                        .advancedMode=${this.advancedMode}
-                        .onCustomizeClick=${() => this.handleCustomizeClick()}
-                        .onHelpClick=${() => this.handleHelpClick()}
-                        .onHistoryClick=${() => this.handleHistoryClick()}
-                        .onAdvancedClick=${() => this.handleAdvancedClick()}
+                        .onViewChange=${view => this.handleViewChange(view)}
                         .onCloseClick=${() => this.handleClose()}
-                        .onBackClick=${() => this.handleBackClick()}
+                        .onBackClick=${() => this.handleClose()}
                         .onHideToggleClick=${() => this.handleHideToggle()}
                         ?isClickThrough=${this._isClickThrough}
                     ></app-header>
